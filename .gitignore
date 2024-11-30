@@ -1,0 +1,5 @@
+prog
+
+*.sh
+
+.vscode/

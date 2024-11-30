@@ -1,0 +1,48 @@
+classDiagram
+
+class Funcionario{
+    -string nome
+    -string cpf
+    -double salarioBruto
+    -double salarioLiquido
+
+    +void setSalarioBruto()
+    +void setSalarioLiquido()
+    +void setCpf()
+    +void setNome()
+    +Funcionario(string nome, string cpf)
+    +FUncionario(string nome, string cpf, double salarioBruto)
+}
+
+class Estacionamento{
+    -string nome
+    -string cnpj
+    -List~Funcionario*~ funcionarios
+
+    +string getNome()
+    +string getCnpj()
+}
+
+Estacionamento *.. "1..n" Funcionario
+
+class Veiculo{
+    -string marca
+    -string modelo
+    -string ano
+    -double tarifaTotal
+    -unsigned horas
+}
+
+class Moto{
+    
+}
+
+class Carro{
+    
+}
+
+Veiculo <-- Moto
+Veiculo <-- Carro
+
+Estacionamento o.. "0..n" Veiculo
+
