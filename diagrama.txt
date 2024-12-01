@@ -6,10 +6,10 @@ class Funcionario{
     -double salarioBruto
     -double salarioLiquido
 
-    +void setSalarioBruto()
-    +void setSalarioLiquido()
-    +void setCpf()
-    +void setNome()
+    +void setSalarioBruto(double salarioBruto)
+    +void setSalarioLiquido(double salarioLiquido)
+    +void setCpf(string cpf)
+    +void setNome(string nome)
     +Funcionario(string nome, string cpf)
     +FUncionario(string nome, string cpf, double salarioBruto)
 }
@@ -33,7 +33,7 @@ class Estacionamento{
     +double getLucro()
 }
 
-Estacionamento *.. "1..n" Funcionario
+Estacionamento *.. "1..n" Funcionario: tem
 
 class Pagamento{
     -string metodo
@@ -47,6 +47,7 @@ class Pagamento{
 }
 
 class Cliente{
+    <<interface>>
     -double tarifaTotal
 
     +double getTarifaTotal()
@@ -59,9 +60,16 @@ class ClienteEmpresa{
     static +double getTarifaReal()
 }
 
-Cliente <|-- ClienteEmpresa
-Cliente ..> Pagamento
-Estacionamento <.. Pagamento
+class ClienteCivil{
+    -Veiculo veiculo
+}
+
+Cliente <|-- ClienteEmpresa: é um
+Cliente <|-- ClienteCivil: é um
+
+ClienteCivil <.. "1..1" Veiculo: tem
+
+Estacionamento o.. Cliente
 
 class Veiculo{
     -string marca
@@ -77,7 +85,7 @@ class Veiculo{
     +double peso()
 }
 
-Estacionamento o.. "0..n" Veiculo
+Estacionamento o.. "0..n" Veiculo: aloca
 
 class Contabilidade{
     static -double calcularImpostosTrabalhistas(List~Funcionario*~ *funcionarios)
@@ -88,9 +96,11 @@ class Contabilidade{
     static +double definirLucro(double &lucro)
 }
 
-Estacionamento .. Contabilidade
+Estacionamento *.. "1..1" Contabilidade: tem
 
 class FileHandler{
+    <<interface>>
+
     -string tipoArquivo
     -string nomeArquivo
 
@@ -99,13 +109,29 @@ class FileHandler{
 }
 
 class SQLiteHandler{
+    -bool aberto
 
-    +bool criarDB()
+    -bool alterarTabela(const string& tabela, const string& parametro)
+    -bool editarTabela(const string& tabela, const string& parametro)
+    -bool excluirTabela(const string& tabela, const string& parametro)
+
+    +bool executarOperacao(Operacao operacao, const string& tabela, const string& parametro)
+    
 }
 
 class TXTHandler{
     
 }
 
-FileHandler <|.. TXTHandler
-FileHandler <|.. SQLiteHandler
+class Operacao{
+    <<enumeration>>
+    CRIAR=1
+    ALTERAR
+    EDITAR
+    EXCLUIR
+}
+
+FileHandler <|.. TXTHandler: é um
+FileHandler <|.. SQLiteHandler: é um
+SQLiteHandler .. Operacao: usa
+Pagamento .. FileHandler: salva
