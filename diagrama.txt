@@ -17,32 +17,95 @@ class Funcionario{
 class Estacionamento{
     -string nome
     -string cnpj
-    -List~Funcionario*~ funcionarios
+    -unsigned numeroVagasPorAndar
+    -unsigned numeroAndares
+    -double faturamentoBruto
+    -double totalImpostos
+    -double faturamentoLiquido
+    -double lucro
 
     +string getNome()
     +string getCnpj()
+    +unsigned getNumeroVagasPorAndar()
+    +unsigned getNumeroAndares()
+    +double getFaturamentoBruto()
+    +double getFaturamentoLiquido()
+    +double getLucro()
 }
 
 Estacionamento *.. "1..n" Funcionario
+
+class Pagamento{
+    -string metodo
+    -double valorTotal
+
+    Pagamento(string metodo, double tarifa)
+    
+    -void fazerRelatorioPagamento()
+    -bool ehValido()
+    +void fazerPagamento(double &faturamentoBruto)
+}
+
+class Cliente{
+    -double tarifaTotal
+
+    +double getTarifaTotal()
+}
+
+class ClienteEmpresa{
+    -List~Veiculo*~ veiculos
+    -double desconto
+
+    static +double getTarifaReal()
+}
+
+Cliente <|-- ClienteEmpresa
+Cliente ..> Pagamento
+Estacionamento <.. Pagamento
 
 class Veiculo{
     -string marca
     -string modelo
     -string ano
-    -double tarifaTotal
     -unsigned horas
-}
 
-class Moto{
-    
+    +string getMarca()
+    +string getModelo()
+    +string getAno()
+    +double getTarifaTotal()
+    +unsigned getHoras()
+    +double peso()
 }
-
-class Carro{
-    
-}
-
-Veiculo <-- Moto
-Veiculo <-- Carro
 
 Estacionamento o.. "0..n" Veiculo
 
+class Contabilidade{
+    static -double calcularImpostosTrabalhistas(List~Funcionario*~ *funcionarios)
+    static -double calcularImpostosEstataisFaturamento(double &faturamento)
+    static +double calcularImpostosSobFaturamento()
+    static +double calcularImpostosSobTerreno()
+    static +double calcularImpostosTotais()
+    static +double definirLucro(double &lucro)
+}
+
+Estacionamento .. Contabilidade
+
+class FileHandler{
+    -string tipoArquivo
+    -string nomeArquivo
+
+    void setNomeArquivo(string nomeArquivo)
+    void setTypeArquivo(string nomeArquivo)
+}
+
+class SQLiteHandler{
+
+    +bool criarDB()
+}
+
+class TXTHandler{
+    
+}
+
+FileHandler <|.. TXTHandler
+FileHandler <|.. SQLiteHandler
