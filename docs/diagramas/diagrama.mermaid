@@ -14,7 +14,7 @@ class Funcionario{
     +FUncionario(string nome, string cpf, double salarioBruto)
 }
 
-class Estacionamento{
+class Supermercado{
     -string nome
     -string cnpj
     -unsigned numeroVagasPorAndar
@@ -33,7 +33,7 @@ class Estacionamento{
     +double getLucro()
 }
 
-Estacionamento *.. "1..n" Funcionario: tem
+Supermercado *.. "1..n" Funcionario: tem
 
 class Pagamento{
     -string metodo
@@ -48,9 +48,13 @@ class Pagamento{
 
 class Cliente{
     <<interface>>
+    -time_t dataDeEntrada;
+    -time_t dataDeSaida;
     -double tarifaTotal
 
     +double getTarifaTotal()
+    +void setTarifaTotal(double tarifaTotal)
+    +unsigned getHorasGastas()
 }
 
 class ClienteEmpresa{
@@ -69,23 +73,20 @@ Cliente <|-- ClienteCivil: é um
 
 ClienteCivil <.. "1..1" Veiculo: tem
 
-Estacionamento o.. Cliente
+Supermercado o.. Cliente
 
 class Veiculo{
     -string marca
     -string modelo
     -string ano
-    -unsigned horas
+    -void setAno()
 
     +string getMarca()
     +string getModelo()
     +string getAno()
-    +double getTarifaTotal()
-    +unsigned getHoras()
-    +double peso()
 }
 
-Estacionamento o.. "0..n" Veiculo: aloca
+Supermercado o.. "0..n" Veiculo: aloca
 
 class Contabilidade{
     static -double calcularImpostosTrabalhistas(List~Funcionario*~ *funcionarios)
@@ -96,7 +97,7 @@ class Contabilidade{
     static +double definirLucro(double &lucro)
 }
 
-Estacionamento *.. "1..1" Contabilidade: tem
+Supermercado *.. "1..1" Contabilidade: tem
 
 class FileHandler{
     <<interface>>
