@@ -1,3 +1,5 @@
+```mermaid
+
 classDiagram
 
 class Funcionario{
@@ -75,19 +77,6 @@ ClienteCivil <.. "1..1" Veiculo: tem
 
 Supermercado o.. Cliente
 
-class Veiculo{
-    -string marca
-    -string modelo
-    -string ano
-    -void setAno()
-
-    +string getMarca()
-    +string getModelo()
-    +string getAno()
-}
-
-Supermercado o.. "0..n" Veiculo: aloca
-
 class Contabilidade{
     static -double calcularImpostosTrabalhistas(List~Funcionario*~ *funcionarios)
     static -double calcularImpostosEstataisFaturamento(double &faturamento)
@@ -136,3 +125,5 @@ FileHandler <|.. TXTHandler: é um
 FileHandler <|.. SQLiteHandler: é um
 SQLiteHandler .. Operacao: usa
 Pagamento .. FileHandler: salva
+
+```
