@@ -4,9 +4,11 @@ CFLAGS=-std=c++17 -Wall
 INCLUDE=include
 SRC=src
 OBJ=obj
-OUTPUT=output
-LFLAGS=-lsqlite3
+LFLAGS=-lsqlite3 -pthread
 LIBS=libs
+
+OUTPUT=output
+PROG=programa
 
 all: main
 
@@ -22,12 +24,15 @@ ${OBJ}/filehandler.o: include/FileHandler.hpp src/FileHandler.cpp
 ${OBJ}/sqlitehandler.o: include/SqliteHandler.hpp src/SqliteHandler.cpp
 	${CC} ${CFLAGS} -c src/SqliteHandler.cpp -I include -o ${OBJ}/sqlitehandler.o
 
+${OBJ}/queryhandler.o: include/QueryHandler.hpp src/QueryHandler.cpp
+	${CC} ${CFLAGS} -c src/QueryHandler.cpp -I include -o ${OBJ}/queryhandler.o
+
 ${OBJ}/main.o: include/Funcionario.hpp src/main.cpp
 	${CC} ${CFLAGS} -c src/main.cpp -I include -o ${OBJ}/main.o ${LFLAGS}
 
 
-main: ${OBJ}/main.o ${OBJ}/messagehandler.o ${OBJ}/funcionario.o ${OBJ}/filehandler.o ${OBJ}/sqlitehandler.o
-	${CC} ${CFLAGS} ${OBJ}/main.o ${OBJ}/messagehandler.o ${OBJ}/funcionario.o ${OBJ}/filehandler.o ${OBJ}/sqlitehandler.o -I include -o ${OUTPUT}/prog ${LFLAGS}
+main: ${OBJ}/main.o ${OBJ}/messagehandler.o ${OBJ}/funcionario.o ${OBJ}/filehandler.o ${OBJ}/sqlitehandler.o ${OBJ}/queryhandler.o
+	${CC} ${CFLAGS} ${OBJ}/main.o ${OBJ}/messagehandler.o ${OBJ}/funcionario.o ${OBJ}/filehandler.o ${OBJ}/sqlitehandler.o ${OBJ}/queryhandler.o -I include -o ${OUTPUT}/${PROG}/prog ${LFLAGS}
 
 clean:
 	rm -f main ${OBJ}/*.o

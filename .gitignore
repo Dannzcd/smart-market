@@ -131,7 +131,7 @@ $RECYCLE.BIN/
 *.lnk
 
 #pastas de saída
-.db/
+.obj/
 .output/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,visualstudiocode,windows,linux,c
