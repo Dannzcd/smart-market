@@ -48,8 +48,6 @@ class Supermercado{
 
     +string getNome()
     +string getCnpj()
-    +unsigned getNumeroVagasPorAndar()
-    +unsigned getNumeroAndares()
     +double getFaturamentoBruto()
     +double getFaturamentoLiquido()
     +double getLucro()
