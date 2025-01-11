@@ -59,17 +59,47 @@ class Supermercado{
 
 Supermercado *.. "1..n" Funcionario: tem
 
+class Marca{
+    -string nome
+
+    +Marca()
+    +Marca(std::string nome)
+
+    +std::string getNome()
+    +void setNome(std::string nome)
+}
+
 class Produto{
     -string nome
-    -string marca
-    -
+    -double pesoLiquido
+    -double preco
+    -unsigned unidadesDisponiveis
+
+    +Produto()
+    +Produto(Marca* marca)
+    +Produto(std::string nome, Marca* marca, double pesoLiquido, double preco)
+
+    +std::string getNome()
+    +std::string getMarca()
+    +double getPesoLiquido()
+    +double getPreco()
+    +bool disponivel()
+    +unsigned getUnidadesDisponiveis()
+
+    +void setNome(std::string nome)
+    +void setMarca(Marca *marca)
+    +void setPesoLiquido(double pesoLiquido)
+    +void adicionarUnidades(unsigned quantidade)
 }
+
+Produto *.. "1..1" Marca
+Supermercado *.. "1..n" Produto
 
 class Pagamento{
     -string metodo
     -double valorTotal
 
-    Pagamento(string metodo, double tarifa)
+    +Pagamento(string metodo, double tarifa)
     
     -void fazerRelatorioPagamento()
     -bool ehValido()
@@ -78,51 +108,35 @@ class Pagamento{
 
 class Cliente{
     <<interface>>
-    -time_t dataDeEntrada;
-    -time_t dataDeSaida;
-    -double tarifaTotal
+    -double subtotal
 
-    +double getTarifaTotal()
-    +void setTarifaTotal(double tarifaTotal)
-    +unsigned getHorasGastas()
+    +double getSubtotal()
 }
 
 class ClienteEmpresa{
-    -List~Veiculo*~ veiculos
-    -double desconto
+    -std::string cnpj
 
-    static +double getTarifaReal()
+    +ClienteEmpresa(std::string cnpj)
+    +std::string getCnpj()
 }
 
 class ClienteCivil{
-    -Veiculo veiculo
+    -std::string cpf 
+    
+    +ClienteCivil(std::string cpf)
+
+    +std::string getCpf()
 }
 
 Cliente <|-- ClienteEmpresa: é um
 Cliente <|-- ClienteCivil: é um
 
-ClienteCivil <.. "1..1" Veiculo: tem
-
 Supermercado o.. Cliente
-
-class Veiculo{
-    -string marca
-    -string modelo
-    -string ano
-    -void setAno()
-
-    +string getMarca()
-    +string getModelo()
-    +string getAno()
-}
-
-Supermercado o.. "0..n" Veiculo: aloca
 
 class Contabilidade{
     static -double calcularImpostosTrabalhistas(List~Funcionario*~ *funcionarios)
     static -double calcularImpostosEstataisFaturamento(double &faturamento)
     static +double calcularImpostosSobFaturamento()
-    static +double calcularImpostosSobTerreno()
     static +double calcularImpostosTotais()
     static +double definirLucro(double &lucro)
 }
@@ -156,10 +170,11 @@ class TXTHandler{
 
 class Operacao{
     <<enumeration>>
-    CRIAR=1
-    ALTERAR
-    EDITAR
-    EXCLUIR
+    CRIAR_BASE_DADOS=1,
+    CRIAR_TABELAS,
+    ALTERAR_LINHA,
+    EDITAR_LINHA,
+    EXCLUIR_LINHA
 }
 
 FileHandler <|.. TXTHandler: é um
