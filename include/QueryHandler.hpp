@@ -5,11 +5,18 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <exception>
+#include "Dir.hpp"
+
+//
+
+//caminhos
 
 class QueryHandler{
 public:
-    static std::vector<std::string>* carregarQueriesDeSetup(std::string *nomeArquivo);
-    static unsigned contarQueries(std::string *nomeArquivo);
+    static std::vector<std::string>* carregarConjuntoQueries(std::string *caminhoArquivoSQL);
+    static std::string* carregarQueryUnica(std::string *caminhoArquivoSQL);
+    //static unsigned contarQueries(std::string *nomeArquivo);
 };
 
 #endif

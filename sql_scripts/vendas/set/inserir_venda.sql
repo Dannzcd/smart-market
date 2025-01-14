@@ -1,0 +1,1 @@
+INSERT INTO VENDAS (id_cliente, descricao, data_venda) VALUES (?, ?, ?);

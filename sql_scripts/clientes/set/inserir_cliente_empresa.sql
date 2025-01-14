@@ -1,0 +1,1 @@
+INSERT INTO CLIENTES_EMPRESA (id_cliente, cnpj) VALUES (?, ?);
