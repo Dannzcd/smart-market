@@ -1,0 +1,1 @@
+INSERT INTO CLIENTES (nome) VALUES (?);

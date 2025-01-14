@@ -1,0 +1,1 @@
+INSERT INTO CLIENTES_CIVIL (id_cliente, cpf) VALUES (?, ?);

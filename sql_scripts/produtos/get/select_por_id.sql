@@ -1,0 +1,2 @@
+SELECT * FROM PRODUTOS
+WHERE PRODUTOS.id_produto = ?;

@@ -2,23 +2,30 @@
 #include "MessageHandler.hpp"
 #include "SqliteHandler.hpp"
 
-std::vector<std::string> *QueryHandler::carregarQueriesDeSetup(std::string *nomeArquivo){
+/* std::string* QueryHandler::carregarQueryUnica(std::string* caminhoArquivoSQL){
+
+} */
+
+std::vector<std::string> *QueryHandler::carregarConjuntoQueries(std::string *caminhoArquivoSQL){
     std::ifstream arquivoSql;
     std::string linha;
     std::string query;
     std::vector<std::string> *queries = new std::vector<std::string>;
-    size_t queriesEncontradas = 0;
+    std::runtime_error *erro = nullptr;
+    unsigned queriesEncontradas = 0;
 
-    arquivoSql.open(nomeArquivo->c_str());
+    arquivoSql.open(caminhoArquivoSQL->c_str());
+
+    //std::cout << caminhoArquivoSQL->c_str() << std::endl;
 
     if (arquivoSql.fail()){
         //jogar excecao
-        MessageHandler::MostrarErro("Erro ao abrir o arquivo SQL");
         arquivoSql.close();
-        return NULL;
+        erro = new std::runtime_error("Erro ao abrir o arquivo SQL\nArquivo não existe ou está corrompido");
+        throw erro;
     }
 
-    queries->reserve(20);
+    queries->reserve(QUANTIDADE_MINIMA_QUERIES);
 
     while (std::getline(arquivoSql, linha)){
         if (!linha.empty() && (linha.find_first_not_of(" \t") != std::string::npos)){
@@ -38,4 +45,27 @@ std::vector<std::string> *QueryHandler::carregarQueriesDeSetup(std::string *nome
 
     arquivoSql.close();
     return queries;
+}
+
+std::string* QueryHandler::carregarQueryUnica(std::string *caminhoArquivoSQL){
+    std::ifstream arquivoSQL;
+    std::string linha;
+    std::string *query = new std::string;
+    std::runtime_error *erro = nullptr;
+
+    //o caminho vem pela main
+    arquivoSQL.open(caminhoArquivoSQL->c_str());
+
+    if (arquivoSQL.fail()){
+        arquivoSQL.close();
+        erro = new std::runtime_error("Erro ao abrir o arquivo SQL\nArquivo não existe ou está corrompido");
+        throw erro;
+    }
+
+    while (std::getline(arquivoSQL, linha)){
+        (*query) += linha;
+    }
+
+    //std::cout << query->c_str() << std::endl;
+    return query;
 }

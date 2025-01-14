@@ -1,0 +1,2 @@
+SELECT * FROM VENDAS
+WHERE VENDAS.id_venda = ?;

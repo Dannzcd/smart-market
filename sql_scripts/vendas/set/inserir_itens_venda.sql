@@ -1,0 +1,1 @@
+INSERT INTO ITENS_VENDA (id_venda, id_produto, quantidade, preco_unitario, valor_total) VALUES (?, ?, ?, ?, ?);

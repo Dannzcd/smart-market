@@ -7,6 +7,17 @@ Projeto simples para faculdade.
 - sqlite3: Para sistemas baseados em RedHat: sudo dnf install sqlite-devel
 - sqlite3: Para sistemas baseados em debian/ubuntu: sudo apt-get install libsqlite3-dev
 
+## Como compilar e rodar o código? (ATENÇÃO! ISSO NÃO É UMA INSTALAÇÃO FORMAL DO PROGRAMA!)
+- Instale o make na sua máquina (https://gnuwin32.sourceforge.net/packages/make.htm)
+
+- Instale o python3 na sua máquina (https://www.python.org/downloads/)
+
+- Execute o comando "git clone https://github.com/Dannzcd/smart-market.git"
+
+- Entre na pasta "smart-market" e execute o script "setup.py" utilizando o comando "python3 setup.py". Esse script criará as pastas temporárias.
+
+- Na mesma pasta, execute o comando "make" no terminal/cmd
+
 ## Impostos calculados
 
 1. Contribuição Social sobre o Lucro Líquido (CSLL) -> 9%
@@ -26,6 +37,7 @@ classDiagram
 
 class Funcionario{
     -string nome
+    -string sobrenome
     -string cpf
     -double salarioBruto
     -double salarioLiquido
@@ -105,6 +117,7 @@ class Pagamento{
 class Cliente{
     <<interface>>
     -double subtotal
+    -string nome
 
     +double getSubtotal()
 }
