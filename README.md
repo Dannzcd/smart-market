@@ -192,19 +192,3 @@ SQLiteHandler .. Operacao: usa
 Pagamento .. FileHandler: salva
 
 ```
-
-# Tipos de buscas disponíveis
-## Produto
-- Por id
-- Por tipo
-- Por marca
-- Produtos esgotados (quantidade == 0)
-- Produtos disponíveis (quanitdade > 0)
-
-## Funcionario
-- Por cpf
-
-## Venda
-- Por id
-- Por tipo
-- Por data (AAAA-MM-DD)

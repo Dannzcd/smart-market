@@ -1,6 +1,7 @@
 #ifndef PATHMAPPER_HPP
 #define PATHMAPPER_HPP
 
+#include <iostream>
 #include <fstream>
 #include <filesystem>
 #include <unordered_map>

@@ -8,6 +8,7 @@
 #include "MessageHandler.hpp"
 #include "Dir.hpp"
 #include "Funcionario.hpp"
+#include "ClienteCivil.hpp"
 
 void *routine(void *variavel){
     std::cout << "Vou dormir por 5 segundos" << std::endl;
@@ -18,20 +19,20 @@ void *routine(void *variavel){
 }
 
 int main(int argc, char *argv[]){
-    std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
-    //Funcionario f1("daniel", "123.231.212-32");
-    //f1.setSalarioBruto(7021.29);
+    //sem dinamicidade, não tem tempo de implementar
+    //std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
+
+    std::string nome("pinto");
 
     try{
         SqliteHandler controladorSqlite;
-        //smart-market/sql_scripts/funcionarios/set/inserir_funcionario.sql
-        std::cout << caminho << std::endl;
-        controladorSqlite.executarOperacao(Operacao::INSERIR_LINHA, caminho);
+        ClienteCivil c(&controladorSqlite);
+        c.setNome(nome);
+        c.buscar();
     }
 
-    catch(std::runtime_error *erro){
-        MessageHandler::MostrarErro(erro->what());
-        delete erro;
+    catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
     }
 
     sleep(300);
