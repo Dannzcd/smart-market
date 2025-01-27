@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
     pthread_t threadEntrada;
 
     // Cria a thread para monitorar a entrada do usuário
-    pthread_create(&threadEntrada, nullptr, monitorarEntrada, nullptr);
     std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
     std::string nome("teste");
 
@@ -47,21 +46,8 @@ int main(int argc, char *argv[]) {
         MessageHandler::MostrarErro(erro.what());
     }
 
-    sleep(300);
-
     // Cria a thread para monitorar a entrada do usuário
     pthread_create(&threadEntrada, nullptr, monitorarEntrada, nullptr);
-
-    std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
-
-    try {
-        SqliteHandler controladorSqlite;
-        std::cout << caminho << std::endl;
-        controladorSqlite.executarOperacao(Operacao::INSERIR_LINHA, caminho);
-    } catch (std::runtime_error *erro) {
-        MessageHandler::MostrarErro(erro->what());
-        delete erro;
-    }
 
     // Substitui sleep(300) por um loop que verifica a condição de encerramento
     int contador = 0;
