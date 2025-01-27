@@ -3,11 +3,11 @@
 SqliteHandler::SqliteHandler(){  
     this->nomeBD = NOME_ARQUIVO_BD_PADRAO;
     try{
+        this->caminhoCompletoBaseDeDados = CAMINHO_BD_PADRAO+this->nomeBD;
         this->executarOperacao(Operacao::CRIAR_BASE_DADOS);
         this->executarOperacao(Operacao::CRIAR_TABELAS);
-    } catch(std::runtime_error* erro){
-        MessageHandler::MostrarErro(erro->what());
-        delete erro;
+    } catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
     }
     
 }
@@ -34,29 +34,24 @@ bool SqliteHandler::dbExiste(){
 }
 
 void SqliteHandler::executarOperacao(Operacao operacao){
-    std::runtime_error *erro = nullptr; 
-    
     switch (operacao) {
         case Operacao::CRIAR_BASE_DADOS:
-            criarBaseDados(erro);
+            criarBaseDados();
             break;
 
         case Operacao::CRIAR_TABELAS:
-            criarTabelas(erro);
+            criarTabelas();
             break;
 
         default:
-            erro = new std::runtime_error("COMANDO INVÁLIDO");
-            throw erro; // Operação inválida
+            throw std::runtime_error("COMANDO INVÁLIDO"); // Operação inválida
     }
 }
 
-void SqliteHandler::executarOperacao(Operacao operacao, std::string &caminhoQuery){
-    std::runtime_error *erro = nullptr; 
-    
+void SqliteHandler::executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), std::string* argumentos){
     switch (operacao) {
         case Operacao::INSERIR_LINHA:
-            inserirLinha(erro, caminhoQuery);
+            inserirLinha(argumentos);
             break;
 
         case Operacao::EDITAR_LINHA:
@@ -68,50 +63,40 @@ void SqliteHandler::executarOperacao(Operacao operacao, std::string &caminhoQuer
             break;
 
         case Operacao::CAPTURAR_LINHAS:
-            
+            capturarLinhas(callback, nullptr);
             break;
 
         default:
-            erro = new std::runtime_error("COMANDO INVÁLIDO");
-            throw erro; // Operação inválida
+            throw std::runtime_error("COMANDO INVÁLIDO"); // Operação inválida
     }
 }
 
-void SqliteHandler::criarBaseDados(std::runtime_error *erro){
+void SqliteHandler::criarBaseDados(){
     if (this->dbExiste()) return;
-    std::string caminhoCompletoBaseDeDados(CAMINHO_BD_PADRAO+this->nomeBD);
 
-    this->codigoRetorno = sqlite3_open(caminhoCompletoBaseDeDados.c_str(), &this->db);   
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);   
 
     if (this->codigoRetorno != SQLITE_OK){
-        erro = new std::runtime_error("Erro ao criar a base de dados!\nCodigo de erro: " + this->codigoRetorno);
-        throw erro;
+        throw std::runtime_error("Erro ao criar a base de dados!\nCodigo de erro: " + this->codigoRetorno);
     }
     
-    delete queries;
     sqlite3_close_v2(db);
 }
 
-void SqliteHandler::criarTabelas(std::runtime_error *erro){
+void SqliteHandler::criarTabelas(){
     char *errorMsg = nullptr;
-
-    std::string caminhoCompletoBaseDeDados(CAMINHO_BD_PADRAO+this->nomeBD);
     std::string caminhoCompletoArquivoSQLdeSetup = Dir::combinarCaminhos(CAMINHO_SETUP, ARQUIVO_CRIAR_TABELAS);
 
-    this->codigoRetorno = sqlite3_open(caminhoCompletoBaseDeDados.c_str(), &this->db);
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
 
     if (this->codigoRetorno != SQLITE_OK){
-        erro = new std::runtime_error("Erro ao abrir a base de dados");
-        throw erro;
+        throw std::runtime_error("Erro ao abrir a base de dados");
     }
 
     this->codigoRetorno = sqlite3_exec(db, "PRAGMA foreign_keys = ON;", NULL, NULL, NULL);
 
     if (this->codigoRetorno != SQLITE_OK){
-        //std::cerr << "ERRO COD: " << this->codigoRetorno << std::endl;
-        //std::cerr << "ERRO MSG: " << errorMsg << std::endl;
-        erro = new std::runtime_error("Erro ao abrir a base de dados");
-        throw erro;
+        throw std::runtime_error("Erro ao abrir a base de dados");
     }
 
     this->setQueries(&caminhoCompletoArquivoSQLdeSetup);
@@ -119,14 +104,9 @@ void SqliteHandler::criarTabelas(std::runtime_error *erro){
     for (auto iterador = queries->begin(); iterador != queries->end(); ++iterador){
         this->codigoRetorno = sqlite3_exec(db, (*iterador).c_str(), NULL, NULL, &errorMsg);
         if (this->codigoRetorno != SQLITE_OK){
-            /* std::cerr << "DEU RUIM NA HORA DE EXECUTAR" << std::endl;
-            std::cerr << "ERRO COD: " << this->codigoRetorno << std::endl;
-            std::cerr << "ERRO MSG: " << errorMsg << std::endl; */
-            
+            std::cout << errorMsg << std::endl;
             sqlite3_free(errorMsg);
-            erro = new std::runtime_error("Erro ao executar a query");
-            
-            throw erro;
+            throw std::runtime_error("Erro ao executar a query");;
         }
     }
 
@@ -135,30 +115,33 @@ void SqliteHandler::criarTabelas(std::runtime_error *erro){
     sqlite3_close_v2(db);
 }
 
-void SqliteHandler::inserirLinha(std::runtime_error *erro, std::string caminhoQuery){
-    //char *errorMsg = nullptr;
-    std::string *query = nullptr;
-    std::string caminhoCompletoBaseDeDados(CAMINHO_BD_PADRAO+this->nomeBD);
-    //std::ifstream arquivoQuery = QueryHandler::
-
-    this->codigoRetorno = sqlite3_open(caminhoCompletoBaseDeDados.c_str(), &this->db);
-
+void SqliteHandler::inserirLinha(std::string* argumentos){
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
     if (this->codigoRetorno != SQLITE_OK){
-        std::cerr << "DEU RUIM AO ABRIR " << this->nomeBD << " PATRAO" << std::endl;
-        erro = new std::runtime_error("Erro ao abrir a base de dados");
-        throw erro;
+        throw std::runtime_error("Erro ao executar a query");
     }
 
-    query = QueryHandler::carregarQueryUnica(&caminhoQuery);
-
-    std::cout << (*query) << std::endl;
-
-    sqlite3_prepare_v2(this->db, query->c_str(), -1, &this->queryFormatada, nullptr);
-
-    
-    delete query;
+    sqlite3_prepare_v2(this->db, argumentos->c_str(), -1, &this->queryFormatada, nullptr);
 }
 
-void SqliteHandler::excluirLinha(std::runtime_error *erro, std::string caminhoQuery){
+void SqliteHandler::capturarLinhas(int (*callback)(void *, int, char **, char **), std::string* argumentos){
+    bool argumentoEhNulo = (argumentos == nullptr || argumentos == NULL);
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
+    char **mensagemErro = nullptr;
+
+    //SELECT nome FROM Clientes;
+    if (this->codigoRetorno != SQLITE_OK){
+        throw std::runtime_error("Erro ao abrir a base de dados");
+    }
+    
+    if (argumentoEhNulo){
+        this->codigoRetorno = sqlite3_exec(this->db, "SELECT nome FROM Clientes;", callback, nullptr, mensagemErro);
+        
+    }
+
+    sqlite3_close(this->db);
+}
+
+void SqliteHandler::excluirLinha(std::string* query){
     std::cout << "a" << std::endl;
 }

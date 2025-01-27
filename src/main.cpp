@@ -1,13 +1,11 @@
 #include <iostream>
-#include <sqlite3.h>
-#include <fstream>
 #include <pthread.h>
 #include <unistd.h>
-#include <filesystem>
 #include "SqliteHandler.hpp"
 #include "MessageHandler.hpp"
 #include "Dir.hpp"
 #include "Funcionario.hpp"
+#include "ClienteCivil.hpp"
 
 // Variável global para controlar o encerramento do programa
 volatile bool encerrarPrograma = false;
@@ -33,6 +31,23 @@ void *monitorarEntrada(void *variavel) {
 
 int main(int argc, char *argv[]) {
     pthread_t threadEntrada;
+
+    // Cria a thread para monitorar a entrada do usuário
+    pthread_create(&threadEntrada, nullptr, monitorarEntrada, nullptr);
+    std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
+    std::string nome("teste");
+
+    try {
+        SqliteHandler controladorSqlite;
+        ClienteCivil c(&controladorSqlite);
+        c.setNome(nome);
+        c.buscar();
+    }
+    catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
+    }
+
+    sleep(300);
 
     // Cria a thread para monitorar a entrada do usuário
     pthread_create(&threadEntrada, nullptr, monitorarEntrada, nullptr);

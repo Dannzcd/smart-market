@@ -33,16 +33,17 @@ class SqliteHandler : FileHandler{
     sqlite3_stmt *queryFormatada; //query pré compilada formatada, substituindo os '?' no script
     int codigoRetorno;
     std::string nomeBD;
+    std::string caminhoCompletoBaseDeDados;
     std::vector<std::string> *queries;
 
     bool dbExiste();
-    void criarTabelas(std::runtime_error *erro);
-    void criarBaseDados(std::runtime_error *erro);
+    void criarTabelas();
+    void criarBaseDados();
 
-    void inserirLinha(std::runtime_error *erro, std::string caminhoQuery);
-
-    void excluirLinha(std::runtime_error *erro, std::string caminhoQuery);
-    void editarLinha(std::runtime_error *erro);
+    void inserirLinha(std::string* argumentos);
+    void excluirLinha(std::string* argumentos);
+    void editarLinha();
+    void capturarLinhas(int (*callback)(void *, int, char **, char **), std::string* argumentos);
 
     public:
     SqliteHandler();
@@ -53,8 +54,7 @@ class SqliteHandler : FileHandler{
 
     //metodo generico
     void executarOperacao(Operacao operacao);
-
-    void executarOperacao(Operacao operacao, std::string &caminhoQuery);
+    void executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), std::string* argumentos);
 };
 
 #endif
