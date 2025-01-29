@@ -10,7 +10,11 @@ LIBS=libs
 OUTPUT=output
 PROG=programa
 
-all: main
+all: criar_pastas main
+
+criar_pastas:
+	@mkdir -p ${OBJ} ${OUTPUT}
+	@mkdir -p ${OUTPUT}/programa ${OUTPUT}/db
 
 ${OBJ}/messagehandler.o: ${INCLUDE}/MessageHandler.hpp ${SRC}/MessageHandler.cpp
 	${CC} ${CFLAGS} -c ${SRC}/MessageHandler.cpp -I ${INCLUDE} -o ${OBJ}/messagehandler.o
@@ -61,4 +65,4 @@ main: ${OBJ}/main.o \
 	-I ${INCLUDE} -o ${OUTPUT}/${PROG}/prog ${LFLAGS}
 
 clean:
-	rm -f main ${OBJ}/*.o
+	rm -r ${OBJ} ${OUTPUT}
