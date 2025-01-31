@@ -2,7 +2,7 @@
 #define PRODUTO_HPP
 
 #include <string>
-#include "Marca.hpp" // Inclusão da classe Marca
+#include "Marca.hpp"
 
 class Produto {
 private:
@@ -10,30 +10,30 @@ private:
     double pesoLiquido;
     double preco;
     unsigned unidadesDisponiveis;
-    Marca* marca; // Relacionamento com a classe Marca
+    Marca* marca;
 
 public:
-    Produto();  // Construtor padrão
+    Produto();
     Produto(std::string nome, Marca* marca, double pesoLiquido, double preco);
     Produto(std::string nome, double pesoLiquido, double preco);
 
-    std::string getNome();
+    std::string getNome() const;
     void setNome(std::string nome);
 
-    double getPesoLiquido();
+    double getPesoLiquido() const;
     void setPesoLiquido(double pesoLiquido);
 
-    double getPreco();
+    double getPreco() const;
     void setPreco(double preco);
 
-    unsigned getUnidadesDisponiveis();
+    unsigned getUnidadesDisponiveis() const;
     void setUnidadesDisponiveis(unsigned unidades);
 
-    Marca* getMarca();
+    Marca* getMarca() const;
     void setMarca(Marca* marca);
 
-    bool disponivel();  // Verifica se o produto está disponível
-    void adicionarUnidades(unsigned quantidade);  // Adiciona unidades ao estoque
+    bool disponivel() const;
+    void adicionarUnidades(unsigned quantidade);
 };
 
 #endif
