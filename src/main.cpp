@@ -6,6 +6,7 @@
 #include "Dir.hpp"
 #include "Funcionario.hpp"
 #include "ClienteCivil.hpp"
+#include "Marca.hpp"
 
 // Variável global para controlar o encerramento do programa
 volatile bool encerrarPrograma = false;
@@ -34,13 +35,25 @@ int main(int argc, char *argv[]) {
 
     // Cria a thread para monitorar a entrada do usuário
     std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
-    std::string nome("teste");
+    std::string nome("veja");
+    SqliteHandler controladorSqlite;
+    Marca m1;
+    std::string argumentos("WHERE id_marca = 10");
+
+    m1.setNome(nome);
+    m1.setId(10);
+    //
+    m1.setSqliteHandler(&controladorSqlite);
+
+    //IMPORTANTE: ELE DIFERENCIA AVISOS DE ERROS
+    //EXEMPLOS: 
 
     try {
-        SqliteHandler controladorSqlite;
-        ClienteCivil c(&controladorSqlite);
-        c.setNome(nome);
-        c.buscar();
+        Marca::buscarMarcas(&m1, nullptr);
+        m1.excluir();
+    }
+    catch(std::string& aviso){
+        MessageHandler::MostrarAviso(aviso);
     }
     catch(std::runtime_error& erro){
         MessageHandler::MostrarErro(erro.what());

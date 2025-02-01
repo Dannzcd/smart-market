@@ -48,22 +48,20 @@ void SqliteHandler::executarOperacao(Operacao operacao){
     }
 }
 
-void SqliteHandler::executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), std::string* argumentos){
+void SqliteHandler::executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), const char* tabela, std::string campos, std::string* argumentos){
+    if (tabela == nullptr) throw std::runtime_error("TABELA INEXISTENTE");
+    
     switch (operacao) {
         case Operacao::INSERIR_LINHA:
-            inserirLinha(argumentos);
-            break;
-
-        case Operacao::EDITAR_LINHA:
-
+            inserirLinha(tabela, campos, argumentos);
             break;
 
         case Operacao::EXCLUIR_LINHA:
-
+            excluirLinha(tabela, argumentos);
             break;
 
         case Operacao::CAPTURAR_LINHAS:
-            capturarLinhas(callback, nullptr);
+            capturarLinhas(callback, tabela, campos, nullptr);
             break;
 
         default:
@@ -77,7 +75,7 @@ void SqliteHandler::criarBaseDados(){
     this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);   
 
     if (this->codigoRetorno != SQLITE_OK){
-        throw std::runtime_error("Erro ao criar a base de dados!\nCodigo de erro: " + this->codigoRetorno);
+        throw std::runtime_error("Erro ao criar a base de dados! Codigo de erro: " + this->codigoRetorno);
     }
     
     sqlite3_close_v2(db);
@@ -115,33 +113,92 @@ void SqliteHandler::criarTabelas(){
     sqlite3_close_v2(db);
 }
 
-void SqliteHandler::inserirLinha(std::string* argumentos){
+// insere argumentos (dado1, dado2, ..., dadon) dentro da tabela
+void SqliteHandler::inserirLinha(const char* tabela, std::string campos, std::string* argumentos){
+    if (argumentos == nullptr) throw std::runtime_error("Não é possível inserir sem argumentos");
+    
     this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
+
+    if (this->codigoRetorno != SQLITE_OK){
+        throw std::runtime_error("Erro ao abrir a base de dados");
+    }
+    
+    std::string query = std::string("INSERT OR REPLACE INTO ") +
+        tabela + " (" + campos + ") VALUES " +
+        (*argumentos) + ';';
+
+    std::cout << query << std::endl;
+    
     if (this->codigoRetorno != SQLITE_OK){
         throw std::runtime_error("Erro ao executar a query");
     }
 
-    sqlite3_prepare_v2(this->db, argumentos->c_str(), -1, &this->queryFormatada, nullptr);
+    this->codigoRetorno = sqlite3_exec(this->db, query.c_str(), nullptr, nullptr, nullptr);
+
+    sqlite3_close_v2(this->db);
 }
 
-void SqliteHandler::capturarLinhas(int (*callback)(void *, int, char **, char **), std::string* argumentos){
+void SqliteHandler::capturarLinhas(int (*callback)(void *, int, char **, char **), const char *tabela, std::string& campos, std::string* argumentos){
     bool argumentoEhNulo = (argumentos == nullptr || argumentos == NULL);
+    bool achou = false;
     this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
     char **mensagemErro = nullptr;
+    std::string query;
+    std::string aviso = std::string("Objeto do tipo \"") + tabela + "\" não foi encontrado";
+
+    std::cout << query << std::endl;
 
     //SELECT nome FROM Clientes;
     if (this->codigoRetorno != SQLITE_OK){
         throw std::runtime_error("Erro ao abrir a base de dados");
     }
-    
+
     if (argumentoEhNulo){
-        this->codigoRetorno = sqlite3_exec(this->db, "SELECT nome FROM Clientes;", callback, nullptr, mensagemErro);
-        
+        query = "SELECT " + campos + " FROM " + tabela + ';';
+        std::cout << query << std::endl;
     }
 
-    sqlite3_close(this->db);
+    else{
+        query = "SELECT " + campos + " FROM " + tabela +
+        (*argumentos) + ';';
+    }
+
+    this->codigoRetorno = sqlite3_exec(this->db, query.c_str(), callback, &achou, mensagemErro);
+
+    if (this->codigoRetorno != SQLITE_OK) throw std::runtime_error("Não foi possível executar a query");
+
+    sqlite3_close_v2(this->db);
+
+    if (!achou){
+        throw aviso;
+    }
 }
 
-void SqliteHandler::excluirLinha(std::string* query){
-    std::cout << "a" << std::endl;
+void SqliteHandler::excluirLinha(const char* tabela, std::string* argumentos){
+    std::string query = "DELETE FROM " + std::string(tabela) + ' ' + (*argumentos) + ";";
+    std::cout << query << std::endl;
+
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
+
+    if (this->codigoRetorno != SQLITE_OK){
+        throw std::runtime_error("Erro ao abrir a base de dados");
+    }
+
+    this->codigoRetorno = sqlite3_exec(
+        this->db,
+        query.c_str(),
+        nullptr,
+        nullptr,
+        nullptr
+    );
+
+    if (this->codigoRetorno != SQLITE_OK){
+        throw std::runtime_error("NÃO FOI POSSÍVEL EXECUTAR A EXCLUSÃO DE OBJETO");
+    }
+
+    if (sqlite3_changes(this->db) == 0){
+        throw std::string("Não é possível excluir um objeto inexistente!");
+    }
+
+    sqlite3_close_v2(this->db);
 }

@@ -1,1 +1,1 @@
-SELECT nome FROM Clientes;
+DELETE FROM MARCAS WHERE nome = 'Marca_003';

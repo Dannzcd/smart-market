@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=c++17 -Wall
+CFLAGS=-std=c++17 -Wall -Wextra
 
 INCLUDE=include
 SRC=src
@@ -10,7 +10,11 @@ LIBS=libs
 OUTPUT=output
 PROG=programa
 
-all: main
+all: criar_pastas main
+
+criar_pastas:
+	@mkdir -p ${OBJ} ${OUTPUT}
+	@mkdir -p ${OUTPUT}/programa ${OUTPUT}/db
 
 ${OBJ}/messagehandler.o: ${INCLUDE}/MessageHandler.hpp ${SRC}/MessageHandler.cpp
 	${CC} ${CFLAGS} -c ${SRC}/MessageHandler.cpp -I ${INCLUDE} -o ${OBJ}/messagehandler.o
@@ -36,8 +40,12 @@ ${OBJ}/cliente.o: ${INCLUDE}/Cliente.hpp ${SRC}/Cliente.cpp
 ${OBJ}/clientecivil.o: ${INCLUDE}/ClienteCivil.hpp ${SRC}/ClienteCivil.cpp
 	${CC} ${CFLAGS} -c ${SRC}/ClienteCivil.cpp -I ${INCLUDE} -o ${OBJ}/clientecivil.o
 
-${OBJ}/main.o: ${INCLUDE}/Funcionario.hpp ${SRC}/main.cpp
-	${CC} ${CFLAGS} -c ${SRC}/main.cpp -I ${INCLUDE} -o ${OBJ}/main.o ${LFLAGS}
+${OBJ}/marca.o: ${INCLUDE}/Marca.hpp ${SRC}/Marca.cpp
+	${CC} ${CFLAGS} -c ${SRC}/Marca.cpp -I ${INCLUDE} -o ${OBJ}/marca.o
+
+
+${OBJ}/main.o: ${SRC}/main.cpp
+	${CC} ${CFLAGS} -c ${SRC}/main.cpp -I ${INCLUDE} -o ${OBJ}/main.o
 
 main: ${OBJ}/main.o \
 	${OBJ}/messagehandler.o \
@@ -48,8 +56,10 @@ main: ${OBJ}/main.o \
 	${OBJ}/dir.o \
 	${OBJ}/cliente.o \
 	${OBJ}/clientecivil.o \
+	${OBJ}/marca.o
 	
-	${CC} ${CFLAGS} ${OBJ}/main.o \
+	${CC} ${CFLAGS} \
+	${OBJ}/main.o \
 	${OBJ}/messagehandler.o \
 	${OBJ}/funcionario.o \
 	${OBJ}/filehandler.o \
@@ -58,7 +68,8 @@ main: ${OBJ}/main.o \
 	${OBJ}/dir.o \
 	${OBJ}/cliente.o \
 	${OBJ}/clientecivil.o \
+	${OBJ}/marca.o \
 	-I ${INCLUDE} -o ${OUTPUT}/${PROG}/prog ${LFLAGS}
 
 clean:
-	rm -f main ${OBJ}/*.o
+	rm -r ${OBJ} ${OUTPUT}
