@@ -10,5 +10,5 @@ void MessageHandler::MostrarAviso(std::string mensagemAviso){
 }
 
 void MessageHandler::MostrarMensagemSucesso(std::string mensagemSucesso){
-
+    std::cout << MessageHandler::TextoVerde << "[sucesso]: " << mensagemSucesso << MessageHandler::TextoBranco << std::endl;
 }

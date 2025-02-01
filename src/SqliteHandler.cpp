@@ -55,6 +55,10 @@ void SqliteHandler::executarOperacao(Operacao operacao, int (*callback)(void *, 
         case Operacao::INSERIR_LINHA:
             inserirLinha(tabela, campos, argumentos);
             break;
+        
+        case Operacao::EDITAR_LINHA:
+            editarLinha(tabela, campos, argumentos);
+            break;
 
         case Operacao::EXCLUIR_LINHA:
             excluirLinha(tabela, argumentos);
@@ -123,7 +127,7 @@ void SqliteHandler::inserirLinha(const char* tabela, std::string campos, std::st
         throw std::runtime_error("Erro ao abrir a base de dados");
     }
     
-    std::string query = std::string("INSERT OR REPLACE INTO ") +
+    std::string query = std::string("INSERT OR IGNORE INTO ") +
         tabela + " (" + campos + ") VALUES " +
         (*argumentos) + ';';
 
@@ -136,6 +140,41 @@ void SqliteHandler::inserirLinha(const char* tabela, std::string campos, std::st
     this->codigoRetorno = sqlite3_exec(this->db, query.c_str(), nullptr, nullptr, nullptr);
 
     sqlite3_close_v2(this->db);
+}
+
+void SqliteHandler::editarLinha(const char* tabela, std::string campos, std::string* argumentos){
+    std::string query;
+    
+    if (argumentos == nullptr) throw std::runtime_error("Não é possível editar sem argumentos");
+
+    this->codigoRetorno = sqlite3_open(this->caminhoCompletoBaseDeDados.c_str(), &this->db);
+
+    if (this->codigoRetorno != SQLITE_OK){
+        throw std::runtime_error("Erro ao abrir a base de dados");
+    }
+
+    query = std::string("UPDATE ") + tabela + (*argumentos) + ';';
+
+    std::cout << query << std::endl;
+
+    this->codigoRetorno = sqlite3_exec(
+        this->db,
+        query.c_str(),
+        nullptr,
+        nullptr,
+        nullptr
+    );
+
+    sqlite3_close_v2(this->db);
+
+    if (this->codigoRetorno != SQLITE_OK){
+        std::cout << this->codigoRetorno << std::endl;
+        throw std::runtime_error("Não foi possível editar o objeto");
+    }
+
+    if (sqlite3_changes(this->db) == 0){
+        throw std::string("Não é possível editar um objeto que não existe!");
+    }
 }
 
 void SqliteHandler::capturarLinhas(int (*callback)(void *, int, char **, char **), const char *tabela, std::string& campos, std::string* argumentos){

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     std::string argumentos("WHERE id_marca = 10");
 
     m1.setNome(nome);
-    m1.setId(10);
+    m1.setId(1);
     //
     m1.setSqliteHandler(&controladorSqlite);
 
@@ -49,8 +49,15 @@ int main(int argc, char *argv[]) {
     //EXEMPLOS: 
 
     try {
-        Marca::buscarMarcas(&m1, nullptr);
-        m1.excluir();
+        //Marca::buscarMarcas(&m1, nullptr);
+        m1.criar();
+        MessageHandler::MostrarMensagemSucesso("Objeto criado com sucesso!");
+        
+        m1.setNome("vanish");
+        m1.editar();
+        MessageHandler::MostrarMensagemSucesso("Objeto editado com sucesso!");
+        
+        //m1.excluir();
     }
     catch(std::string& aviso){
         MessageHandler::MostrarAviso(aviso);

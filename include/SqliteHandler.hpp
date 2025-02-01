@@ -42,7 +42,7 @@ class SqliteHandler : FileHandler{
 
     void inserirLinha(const char* tabela, std::string campos, std::string* argumentos);
     void excluirLinha(const char* tabela, std::string* argumentos);
-    //void editarLinha(const char* tabela, std::string campos, std::string* argumentos);
+    void editarLinha(const char* tabela, std::string campos, std::string* argumentos);
     void capturarLinhas(int (*callback)(void *, int, char **, char **), const char *tabela, std::string& campos, std::string* argumentos);
 
     public:

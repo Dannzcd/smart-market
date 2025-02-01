@@ -82,7 +82,7 @@ int Marca::callbackMarca(void *data, int argc, char **argv, char **col_name){
     return 0;
 }
 
-void Marca::salvar(){
+void Marca::criar(){
     std::string argumento;
 
     argumento += "('" + this->getNome() + "')";
@@ -96,6 +96,25 @@ void Marca::salvar(){
             "nome", 
             &argumento
         );
+}
+
+void Marca::editar(){
+    std::string argumento;
+
+    if (this->id == SqliteHandler::NAO_ESTA_NO_BANCO){
+        throw std::runtime_error("Não é possível editar um objeto que não foi salvo");
+    }
+
+    argumento = " SET nome='" + this->getNome() + "'"
+                + " WHERE id_marca = " + std::to_string(this->getId());
+
+    this->controladorSQL->executarOperacao(
+        Operacao::EDITAR_LINHA,
+        nullptr,
+        Marca::TABELA_MARCA.c_str(),
+        "nome",
+        &argumento
+    );
 }
 
 void Marca::excluir(){

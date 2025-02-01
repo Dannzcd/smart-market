@@ -35,7 +35,8 @@ class Marca{
     void setSqliteHandler(SqliteHandler *controladorSQL);
     void setId(size_t id);
     bool existe();
-    void salvar();
+    void criar();
+    void editar();
     void excluir();
     size_t getId();
     
