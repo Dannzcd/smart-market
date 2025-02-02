@@ -48,6 +48,7 @@ class SqliteHandler : FileHandler{
     public:
     inline static size_t NAO_ESTA_NO_BANCO = -1;
 
+    sqlite3 *getDb();
     SqliteHandler();
     void setNomeBD(std::string& novoNome);
     std::vector<std::string> *getQueries();

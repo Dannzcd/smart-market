@@ -7,6 +7,7 @@
 #include "Funcionario.hpp"
 #include "ClienteCivil.hpp"
 #include "Marca.hpp"
+#include "Produto.hpp"
 
 // Variável global para controlar o encerramento do programa
 volatile bool encerrarPrograma = false;
@@ -31,33 +32,68 @@ void *monitorarEntrada(void *variavel) {
 }
 
 int main(int argc, char *argv[]) {
+    
     pthread_t threadEntrada;
+    SqliteHandler controladorSqlite;
+    Marca::registrarMarcasPadrao(&controladorSqlite);
 
     // Cria a thread para monitorar a entrada do usuário
-    std::string caminho = Dir::combinarCaminhos(CAMINHO_FUNCIONARIOS, CAMINHO_SET_COMUM, INSERIR_FUNCIONARIO);
     std::string nome("veja");
-    SqliteHandler controladorSqlite;
     Marca m1;
-    std::string argumentos("WHERE id_marca = 10");
+    Produto p1("Desengordurante", &m1, 30.5, 7.99, &controladorSqlite);
 
     m1.setNome(nome);
     m1.setId(1);
     //
-    m1.setSqliteHandler(&controladorSqlite);
+    m1.setControladorSQL(&controladorSqlite);
 
     //IMPORTANTE: ELE DIFERENCIA AVISOS DE ERROS
     //EXEMPLOS: 
 
+    try{
+        Produto::buscarTodosOsProdutos(&controladorSqlite);
+        Produto::imprimirListaProdutos();
+    } 
+    catch(std::string& aviso){
+        MessageHandler::MostrarAviso(aviso);
+    }
+    catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
+    }
+
     try {
         //Marca::buscarMarcas(&m1, nullptr);
-        m1.criar();
-        MessageHandler::MostrarMensagemSucesso("Objeto criado com sucesso!");
         
+
+        //m1.criar();
+        //MessageHandler::MostrarMensagemSucesso("Objeto criado com sucesso!");
+        //m1.excluir();
+    }
+    catch(std::string& aviso){
+        MessageHandler::MostrarAviso(aviso);
+    }
+    catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
+    }
+
+    try{
         m1.setNome("vanish");
         m1.editar();
         MessageHandler::MostrarMensagemSucesso("Objeto editado com sucesso!");
-        
-        //m1.excluir();
+
+        p1.setId(2);
+        //p1.criar();
+        p1.excluir();
+    }
+    catch(std::string& aviso){
+        MessageHandler::MostrarAviso(aviso);
+    }
+    catch(std::runtime_error& erro){
+        MessageHandler::MostrarErro(erro.what());
+    }
+
+    try{
+        p1.editar();
     }
     catch(std::string& aviso){
         MessageHandler::MostrarAviso(aviso);

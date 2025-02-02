@@ -54,29 +54,84 @@ Marca::Marca(size_t id, std::string nome){
     this->setNome(nome);
 }
 
-void Marca::setSqliteHandler(SqliteHandler *controladorSQL){
+void Marca::setControladorSQL(SqliteHandler *controladorSQL){
     this->controladorSQL = controladorSQL;
 }
 
 void Marca::imprimirMarcas(){
-    if (Marca::listaMarcas == nullptr)
-        throw std::runtime_error("A lista de marcas está nula!");
+    /* if (Marca::listaMarcas == nullptr)
+        throw std::runtime_error("A lista de marcas está nula!"); */
 
-    if (Marca::listaMarcas->empty())
+    if (Marca::listaMarcas.empty())
         throw std::runtime_error("A lista de marcas está vazia!");
 
-    for (int i = 0; i < (int)listaMarcas->size(); i++){
-        std::cout << Marca::listaMarcas->at(i).getNome() << std::endl;
+    for (int i = 0; i < (int)listaMarcas.size(); i++){
+        std::cout << Marca::listaMarcas.at(i).getNome() << std::endl;
     }
 }
 
-int Marca::callbackMarca(void *data, int argc, char **argv, char **col_name){
-    bool *achou = static_cast<bool*>(data);
+void Marca::registrarMarcasPadrao(SqliteHandler* controladorSql){
+    std::ostringstream argumentoss;
+    std::string argumento = "a";
+    Marca::listaMarcas.reserve(10);
+    std::vector<std::string> argumentos;
+    argumentos.reserve(10);
+    argumento.reserve(128);
 
-    (*achou) = true;
+    std::string marcasArray[10] = {"Nestlé",
+            "Coca-cola",
+            "Unilever",
+            "P&G",
+            "PepsiCo",
+            "Danone",
+            "Kelloggs",
+            "Perdigão",
+            "Saida",
+            "Ypê"
+    };
+
+    for (int i = 0; i < 10; i++){
+        Marca::listaMarcas.emplace_back(i+1, marcasArray[i]);
+        //std::cout << marcasArray[i] << std::endl;
+    }
+
+    for (Marca& marca: Marca::listaMarcas){
+        argumentoss << "(" << std::to_string(marca.getId()) << ", '" << marca.getNome() << "')";
+        argumento = argumentoss.str();
+        argumentos.emplace_back(argumento);
+
+        if (argumento.empty()) {
+            throw std::runtime_error("Argumento vazio ao inserir linha");
+        }
+
+        argumentoss.str("");
+        argumento.clear();
+    }
+
+    for (std::string& arg: argumentos){
+        try{
+                controladorSql->executarOperacao(
+                Operacao::INSERIR_LINHA,
+                nullptr,
+                Marca::TABELA_MARCA.c_str(),
+                "id_marca, nome",
+                &arg
+            );
+        }
+        catch(std::string& e){
+            
+        }
+        //std::cout << arg << std::endl;
+    }
+}
+
+int Marca::empilharMarcas(void *data, int argc, char **argv, char **col_name){
+    int *achou = static_cast<int*>(data);
+
+    (*achou) = 1;
     
     if (argv != nullptr){
-        Marca::listaMarcas->push_back(Marca(atol(argv[0]), argv[1]));
+        Marca::listaMarcas.push_back(Marca(atol(argv[0]), argv[1]));
     }
 
     return 0;
@@ -86,8 +141,6 @@ void Marca::criar(){
     std::string argumento;
 
     argumento += "('" + this->getNome() + "')";
-
-    std::cout << Marca::TABELA_MARCA << std::endl;
 
     this->getControladorSQL()->executarOperacao(
             Operacao::INSERIR_LINHA, 
@@ -136,22 +189,22 @@ void Marca::excluir(){
 }
 
 void Marca::buscarMarcas(Marca *marca, std::string* argumento){
-    if (Marca::listaMarcas == nullptr){
+    /* if (Marca::listaMarcas == nullptr){
         Marca::listaMarcas = new std::vector<Marca>;
     } else{
         delete Marca::listaMarcas;
         Marca::listaMarcas = new std::vector<Marca>;
-    }
+    } */
 
-    Marca::listaMarcas->reserve(50);
+    Marca::listaMarcas.reserve(20);
 
     if (marca->getControladorSQL() == nullptr) throw std::runtime_error("Controlador SQL não acessível!");
 
     if (argumento == nullptr){
         marca->getControladorSQL()->executarOperacao(
             Operacao::CAPTURAR_LINHAS,
-            marca->callbackMarca,
-            "MARCAS",
+            marca->empilharMarcas,
+            Marca::TABELA_MARCA.c_str(),
             "*",
             nullptr    
         );
@@ -160,8 +213,8 @@ void Marca::buscarMarcas(Marca *marca, std::string* argumento){
     else{
         marca->getControladorSQL()->executarOperacao(
             Operacao::CAPTURAR_LINHAS,
-            marca->callbackMarca,
-            "MARCAS",
+            marca->empilharMarcas,
+            Marca::TABELA_MARCA.c_str(),
             "nome",
             argumento    
         );

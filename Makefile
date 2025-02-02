@@ -40,9 +40,11 @@ ${OBJ}/cliente.o: ${INCLUDE}/Cliente.hpp ${SRC}/Cliente.cpp
 ${OBJ}/clientecivil.o: ${INCLUDE}/ClienteCivil.hpp ${SRC}/ClienteCivil.cpp
 	${CC} ${CFLAGS} -c ${SRC}/ClienteCivil.cpp -I ${INCLUDE} -o ${OBJ}/clientecivil.o
 
+${OBJ}/produto.o: ${INCLUDE}/Produto.hpp ${SRC}/Produto.cpp
+	${CC} ${CFLAGS} -c ${SRC}/Produto.cpp -I ${INCLUDE} -o ${OBJ}/produto.o
+
 ${OBJ}/marca.o: ${INCLUDE}/Marca.hpp ${SRC}/Marca.cpp
 	${CC} ${CFLAGS} -c ${SRC}/Marca.cpp -I ${INCLUDE} -o ${OBJ}/marca.o
-
 
 ${OBJ}/main.o: ${SRC}/main.cpp
 	${CC} ${CFLAGS} -c ${SRC}/main.cpp -I ${INCLUDE} -o ${OBJ}/main.o
@@ -56,7 +58,8 @@ main: ${OBJ}/main.o \
 	${OBJ}/dir.o \
 	${OBJ}/cliente.o \
 	${OBJ}/clientecivil.o \
-	${OBJ}/marca.o
+	${OBJ}/marca.o \
+	${OBJ}/produto.o
 	
 	${CC} ${CFLAGS} \
 	${OBJ}/main.o \
@@ -69,6 +72,7 @@ main: ${OBJ}/main.o \
 	${OBJ}/cliente.o \
 	${OBJ}/clientecivil.o \
 	${OBJ}/marca.o \
+	${OBJ}/produto.o \
 	-I ${INCLUDE} -o ${OUTPUT}/${PROG}/prog ${LFLAGS}
 
 clean:

@@ -1,9 +1,6 @@
-#ifndef TXTHANDLER_HPP
-#define TXTHANDLER_HPP
+#pragma once
 #include "FileHandler.hpp"
 
 class TxtHandler : FileHandler{
     
 };
-
-#endif
