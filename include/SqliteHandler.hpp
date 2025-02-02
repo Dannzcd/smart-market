@@ -1,5 +1,5 @@
-#ifndef SQLITEHANDLER_HPP
-#define SQLITEHANDLER_HPP
+#pragma once
+
 #include "FileHandler.hpp"
 #include "MessageHandler.hpp"
 #include "QueryHandler.hpp"
@@ -40,21 +40,23 @@ class SqliteHandler : FileHandler{
     void criarTabelas();
     void criarBaseDados();
 
-    void inserirLinha(std::string* argumentos);
-    void excluirLinha(std::string* argumentos);
-    void editarLinha();
-    void capturarLinhas(int (*callback)(void *, int, char **, char **), std::string* argumentos);
+    void inserirLinha(const char* tabela, std::string campos, std::string* argumentos);
+    void excluirLinha(const char* tabela, std::string* argumentos);
+    void editarLinha(const char* tabela, std::string campos, std::string* argumentos);
+    void capturarLinhas(int (*callback)(void *, int, char **, char **), const char *tabela, std::string& campos, std::string* argumentos);
 
     public:
+    inline static size_t NAO_ESTA_NO_BANCO = -1;
+
     SqliteHandler();
     void setNomeBD(std::string& novoNome);
     std::vector<std::string> *getQueries();
     void setQueries(std::string nomeArquivo);
     void setQueries(std::string *nomeArquivoSQL);
 
+    void liberarMemoriaCallback(void *data, int argc, char **argv, char **col_name);
+
     //metodo generico
     void executarOperacao(Operacao operacao);
-    void executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), std::string* argumentos);
+    void executarOperacao(Operacao operacao, int (*callback)(void *, int, char **, char **), const char* tabela, std::string campos, std::string* argumentos);
 };
-
-#endif

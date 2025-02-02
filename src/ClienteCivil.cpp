@@ -36,6 +36,6 @@ int ClienteCivil::callbackClienteCivil(void *data, int argc, char **argv, char *
 }
 
 void ClienteCivil::buscar(){
-    this->controladorSQL->executarOperacao(Operacao::CAPTURAR_LINHAS, this->callbackClienteCivil, nullptr);
+    this->controladorSQL->executarOperacao(Operacao::CAPTURAR_LINHAS, this->callbackClienteCivil, "CLIENTES", "nome", nullptr);
 
 }

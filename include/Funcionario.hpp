@@ -1,5 +1,5 @@
-#ifndef FUNCIONARIO_HPP
-#define FUNCIONARIO_HPP
+#pragma once
+
 #include <string>
 
 class Funcionario{
@@ -20,5 +20,3 @@ class Funcionario{
 
     double getSalarioBruto();
 };
-
-#endif

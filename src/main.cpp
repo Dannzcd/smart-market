@@ -18,14 +18,14 @@ std::map<int, Produto> produtos;
 void cadastrarProduto() {
     std::cout << "Iniciando o cadastro do produto...\n";
 
-    std::string nome;
+    std::string nome, marcaNome;
     double pesoLiquido, preco;
     unsigned unidadesDisponiveis;
-    std::string marcaNome;
+    int idTipo;
     Marca* marca = nullptr;
 
     std::cout << "Digite o nome do produto: ";
-    std::getline(std::cin >> std::ws, nome);  // Solução correta para capturar o nome corretamente
+    std::getline(std::cin >> std::ws, nome);
 
     std::cout << "Digite o peso líquido do produto: ";
     std::cin >> pesoLiquido;
@@ -42,16 +42,20 @@ void cadastrarProduto() {
     std::cout << "Digite o nome da marca do produto: ";
     std::getline(std::cin, marcaNome);
 
+    std::cout << "Digite o ID do tipo de produto: ";
+    std::cin >> idTipo;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
     marca = new Marca(marcaNome);
-    Produto novoProduto(nome, marca, pesoLiquido, preco);
+    Produto novoProduto(nome, marca, pesoLiquido, preco, idTipo);
     novoProduto.setUnidadesDisponiveis(unidadesDisponiveis);
+    novoProduto.criar();
 
     int idProduto = produtos.size() + 1;
     produtos[idProduto] = novoProduto;
 
     std::cout << "Produto cadastrado com sucesso!\n";
 }
-
 
 void lerProdutos() {
     if (produtos.empty()) {
@@ -65,18 +69,31 @@ void lerProdutos() {
         std::cout << "ID: " << par.first
                   << " | Nome: " << produto.getNome()
                   << " | Marca: " << (produto.getMarca() ? produto.getMarca()->getNome() : "Sem Marca")
-                  << " | Preço: R$ " << produto.getPreco()
+                  << " | Preço: R$ " << produto.getPrecoUnitario()
                   << " | Peso: " << produto.getPesoLiquido() << " kg"
-                  << " | Estoque: " << produto.getUnidadesDisponiveis() << "\n";
+                  << " | Estoque: " << produto.getUnidadesDisponiveis()
+                  << " | Tipo ID: " << produto.getIdTipo() << "\n";
     }
 }
 
-void editarProduto() {
-    if (produtos.empty()) {
-        std::cout << "Nenhum produto cadastrado para editar.\n";
+void excluirProduto() {
+    int id;
+    std::cout << "Digite o ID do produto que deseja excluir: ";
+    std::cin >> id;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    auto it = produtos.find(id);
+    if (it == produtos.end()) {
+        std::cout << "Produto com ID " << id << " não encontrado.\n";
         return;
     }
 
+    it->second.excluir();
+    produtos.erase(it);
+    std::cout << "Produto removido com sucesso!\n";
+}
+
+void editarProduto() {
     int id;
     std::cout << "Digite o ID do produto que deseja editar: ";
     std::cin >> id;
@@ -89,57 +106,37 @@ void editarProduto() {
     }
 
     Produto& produto = it->second;
-    std::string novoNome, novaMarca;
+    std::string novoNome;
     double novoPreco, novoPeso;
     unsigned novaQuantidade;
+    int novoIdTipo;
 
-    std::cout << "Novo nome do produto (" << produto.getNome() << "): ";
+    std::cout << "Novo nome do produto: ";
     std::getline(std::cin, novoNome);
     if (!novoNome.empty()) produto.setNome(novoNome);
 
-    std::cout << "Novo preço do produto (R$ " << produto.getPreco() << "): ";
+    std::cout << "Novo preço: ";
     std::cin >> novoPreco;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    produto.setPreco(novoPreco);
+    produto.setPrecoUnitario(novoPreco);
 
-    std::cout << "Novo peso líquido do produto (" << produto.getPesoLiquido() << " kg): ";
+    std::cout << "Novo peso líquido: ";
     std::cin >> novoPeso;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     produto.setPesoLiquido(novoPeso);
 
-    std::cout << "Nova quantidade disponível (" << produto.getUnidadesDisponiveis() << "): ";
+    std::cout << "Nova quantidade disponível: ";
     std::cin >> novaQuantidade;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     produto.setUnidadesDisponiveis(novaQuantidade);
 
-    std::cout << "Novo nome da marca (" << produto.getMarca()->getNome() << "): ";
-    std::getline(std::cin, novaMarca);
-    if (!novaMarca.empty()) {
-        produto.getMarca()->setNome(novaMarca);
-    }
-
-    std::cout << "Produto atualizado com sucesso!\n";
-}
-
-void excluirProduto() {
-    if (produtos.empty()) {
-        std::cout << "Nenhum produto cadastrado para excluir.\n";
-        return;
-    }
-
-    int id;
-    std::cout << "Digite o ID do produto que deseja excluir: ";
-    std::cin >> id;
+    std::cout << "Novo ID do tipo de produto: ";
+    std::cin >> novoIdTipo;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    produto.setIdTipo(novoIdTipo);
 
-    auto it = produtos.find(id);
-    if (it == produtos.end()) {
-        std::cout << "Produto com ID " << id << " não encontrado.\n";
-        return;
-    }
-
-    produtos.erase(it);
-    std::cout << "Produto removido com sucesso!\n";
+    produto.editar();
+    std::cout << "Produto atualizado com sucesso!\n";
 }
 
 void *monitorarEntrada(void *variavel) {
@@ -151,20 +148,15 @@ void *monitorarEntrada(void *variavel) {
 
         if (comando == "sair") {
             encerrarPrograma = true;
-        }
-        else if (comando == "cadastrar") {
+        } else if (comando == "cadastrar") {
             cadastrarProduto();
-        }
-        else if (comando == "ler") {
+        } else if (comando == "ler") {
             lerProdutos();
-        }
-        else if (comando == "editar") {
+        } else if (comando == "editar") {
             editarProduto();
-        }
-        else if (comando == "excluir") {
+        } else if (comando == "excluir") {
             excluirProduto();
-        }
-        else {
+        } else {
             std::cout << "Comando não reconhecido!\n";
         }
     }
