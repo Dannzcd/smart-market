@@ -1,33 +1,49 @@
 #include "Funcionario.hpp"
-#include <iostream>
 
-Funcionario::Funcionario(std::string nome, std::string cpf){
+Funcionario::Funcionario() : nome(""), sobrenome(""), cpf(""), salarioBruto(0.0), salarioLiquido(0.0) {}
+
+Funcionario::Funcionario(std::string nome, std::string sobrenome, std::string cpf, double salarioBruto)
+    : nome(nome), sobrenome(sobrenome), cpf(cpf), salarioBruto(salarioBruto) {
+    this->salarioLiquido = salarioBruto * 0.9; // Exemplo de cálculo de salário líquido
+}
+
+void Funcionario::setNome(std::string nome) {
     this->nome = nome;
+}
+
+void Funcionario::setSobrenome(std::string sobrenome) {
+    this->sobrenome = sobrenome;
+}
+
+void Funcionario::setCpf(std::string cpf) {
     this->cpf = cpf;
 }
 
-Funcionario::Funcionario(std::string nome, std::string cpf, double salarioBruto){
-    this->nome = nome;
-    this->cpf = cpf;
+void Funcionario::setSalarioBruto(double salarioBruto) {
     this->salarioBruto = salarioBruto;
+    this->salarioLiquido = salarioBruto * 0.9; // Atualiza salário líquido
 }
 
-Funcionario::Funcionario(){
-    
-}
-
-void Funcionario::setSalarioBruto(double salarioBruto){
-    this->salarioBruto = salarioBruto;
-}
-
-void Funcionario::setSalarioLiquido(double salarioLiquido){
+void Funcionario::setSalarioLiquido(double salarioLiquido) {
     this->salarioLiquido = salarioLiquido;
 }
 
-void Funcionario::setCpf(std::string cpf){
-    this->cpf = cpf;
+std::string Funcionario::getNome() const {
+    return nome;
 }
 
-double Funcionario::getSalarioBruto(){
-    return this->salarioBruto;
+std::string Funcionario::getSobrenome() const {
+    return sobrenome;
+}
+
+std::string Funcionario::getCpf() const {
+    return cpf;
+}
+
+double Funcionario::getSalarioBruto() const {
+    return salarioBruto;
+}
+
+double Funcionario::getSalarioLiquido() const {
+    return salarioLiquido;
 }

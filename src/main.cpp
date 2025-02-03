@@ -14,6 +14,9 @@
 
 volatile bool encerrarPrograma = false;
 std::map<int, Produto> produtos;
+std::map<std::string, Funcionario> funcionarios;  // Armazenando os funcionários
+
+// Funções relacionadas ao produto
 
 void cadastrarProduto() {
     std::cout << "Iniciando o cadastro do produto...\n";
@@ -51,7 +54,6 @@ void cadastrarProduto() {
 
     std::cout << "Produto cadastrado com sucesso!\n";
 }
-
 
 void lerProdutos() {
     if (produtos.empty()) {
@@ -142,6 +144,122 @@ void excluirProduto() {
     std::cout << "Produto removido com sucesso!\n";
 }
 
+// Função para ler todos os funcionários cadastrados
+void lerFuncionarios() {
+    if (funcionarios.empty()) {
+        std::cout << "Nenhum funcionário cadastrado.\n";
+        return;
+    }
+
+    std::cout << "Lista de funcionários cadastrados:\n";
+    for (const auto& par : funcionarios) {
+        const Funcionario& funcionario = par.second;
+        std::cout << "Nome: " << funcionario.getNome() 
+                  << " | Sobrenome: " << funcionario.getSobrenome() 
+                  << " | CPF: " << funcionario.getCpf()
+                  << " | Salário Bruto: R$ " << funcionario.getSalarioBruto() 
+                  << " | Salário Líquido: R$ " << funcionario.getSalarioLiquido() 
+                  << "\n";
+    }
+}
+
+void cadastrarFuncionario() {
+    std::string nome, sobrenome, cpf;
+    double salarioBruto;
+
+    // Ler o nome
+    std::cout << "Digite o nome do funcionário: ";
+    std::getline(std::cin, nome);
+
+    // Ler o sobrenome
+    std::cout << "Digite o sobrenome do funcionário: ";
+    std::getline(std::cin, sobrenome);
+
+    // Ler o CPF
+    std::cout << "Digite o CPF do funcionário: ";
+    std::getline(std::cin, cpf);
+
+    // Ler o salário bruto
+    std::cout << "Digite o salário bruto do funcionário: ";
+    std::cin >> salarioBruto;
+    std::cin.ignore();  // Limpar o buffer de entrada
+
+    // Criar o novo funcionário
+    Funcionario novoFuncionario(nome, sobrenome, cpf, salarioBruto);
+    funcionarios[cpf] = novoFuncionario;
+
+    // Mostrar os dados do novo funcionário
+    std::cout << "Funcionário cadastrado com sucesso!\n";
+    std::cout << "Nome: " << novoFuncionario.getNome() << "\n";
+    std::cout << "Sobrenome: " << novoFuncionario.getSobrenome() << "\n";
+    std::cout << "CPF: " << novoFuncionario.getCpf() << "\n";
+    std::cout << "Salário Bruto: R$ " << novoFuncionario.getSalarioBruto() << "\n";
+    std::cout << "Salário Líquido: R$ " << novoFuncionario.getSalarioLiquido() << "\n";
+}
+
+
+void editarFuncionario() {
+    std::string cpf;
+    std::cout << "Digite o CPF do funcionário que deseja editar: ";
+    std::getline(std::cin, cpf);
+
+    auto it = funcionarios.find(cpf);
+    if (it != funcionarios.end()) {
+        Funcionario& funcionario = it->second;
+        std::string novoNome, novoSobrenome;
+        double novoSalarioBruto;
+
+        std::cout << "Novo nome do funcionário (" << funcionario.getNome() << "): ";
+        std::getline(std::cin, novoNome);
+        if (!novoNome.empty()) funcionario.setNome(novoNome);
+
+        std::cout << "Novo sobrenome do funcionário (" << funcionario.getSobrenome() << "): ";
+        std::getline(std::cin, novoSobrenome);
+        if (!novoSobrenome.empty()) funcionario.setSobrenome(novoSobrenome);
+
+        std::cout << "Novo salário bruto do funcionário (R$ " << funcionario.getSalarioBruto() << "): ";
+        std::cin >> novoSalarioBruto;
+        std::cin.ignore();
+        funcionario.setSalarioBruto(novoSalarioBruto);
+
+        std::cout << "Funcionário atualizado com sucesso!\n";
+    } else {
+        std::cout << "Funcionário não encontrado.\n";
+    }
+}
+
+void excluirFuncionario() {
+    std::string cpf;
+    std::cout << "Digite o CPF do funcionário que deseja excluir: ";
+    std::getline(std::cin, cpf);
+
+    auto it = funcionarios.find(cpf);
+    if (it != funcionarios.end()) {
+        funcionarios.erase(it);
+        std::cout << "Funcionário excluído com sucesso!\n";
+    } else {
+        std::cout << "Funcionário não encontrado.\n";
+    }
+}
+
+void exibirFuncionario() {
+    std::string cpf;
+    std::cout << "Digite o CPF do funcionário que deseja exibir: ";
+    std::getline(std::cin, cpf);
+
+    auto it = funcionarios.find(cpf);
+    if (it != funcionarios.end()) {
+        const Funcionario& funcionario = it->second;
+        std::cout << "Nome: " << funcionario.getNome() << "\n";
+        std::cout << "Sobrenome: " << funcionario.getSobrenome() << "\n";
+        std::cout << "CPF: " << funcionario.getCpf() << "\n";
+        std::cout << "Salário Bruto: R$ " << funcionario.getSalarioBruto() << "\n";
+        std::cout << "Salário Líquido: R$ " << funcionario.getSalarioLiquido() << "\n";
+    } else {
+        std::cout << "Funcionário não encontrado.\n";
+    }
+}
+
 void *monitorarEntrada(void *variavel) {
     std::string comando;
     while (!encerrarPrograma) {
@@ -163,17 +281,17 @@ void *monitorarEntrada(void *variavel) {
         }
         else if (comando == "excluir") {
             excluirProduto();
-        }
-        else {
-            std::cout << "Comando não reconhecido!\n";
-        }
+        } 
     }
     return nullptr;
 }
+
+
 
 int main(int argc, char *argv[]) {
     pthread_t threadEntrada;
     pthread_create(&threadEntrada, nullptr, monitorarEntrada, nullptr);
     pthread_join(threadEntrada, nullptr);
+
     return 0;
 }
