@@ -16,7 +16,7 @@ volatile bool encerrarPrograma = false;
 std::map<int, Produto> produtos;
 
 void cadastrarProduto() {
-    std::cout << "Iniciando o cadastro do produto...\n";
+    std::cout << "Iniciando o cadastro doss produtos...\n";
 
     std::string nome, marcaNome;
     double pesoLiquido, preco;
